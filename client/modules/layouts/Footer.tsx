@@ -1,5 +1,5 @@
 const Footer: React.FC = () => {
-  return <></>
-}
+  return <></>;
+};
 
 export default Footer;
