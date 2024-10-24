@@ -1,5 +1,9 @@
-import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
-import { Server, Socket } from "socket.io"
+import {
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
+} from '@nestjs/websockets';
+import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({
   cors: {
@@ -8,7 +12,7 @@ import { Server, Socket } from "socket.io"
   },
 })
 export class EventsGateway {
-  @WebSocketServer() server: Server
+  @WebSocketServer() server: Server;
 
   handleConnection(client: Socket) {
     console.log(`Client connected: ${client.id}`);
@@ -21,7 +25,7 @@ export class EventsGateway {
   @SubscribeMessage('message')
   handleMessage(client: any, payload: any): void {
     // console.log("[Message Event] [Client] ", client);
-    console.log("[Message Event] [payload] ", payload);
-    this.server.emit("message", payload)
+    console.log('[Message Event] [payload] ', payload);
+    this.server.emit('message', payload);
   }
 }
