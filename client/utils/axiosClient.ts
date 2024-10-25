@@ -30,12 +30,12 @@ axiosClient.interceptors.request.use(
 );
 
 axiosClient.interceptors.response.use(
-  response => {
-    console.log('Intercepting the response before sending it', response)
-    return response
+  (response) => {
+    console.log("Intercepting the response before sending it", response);
+    return response;
   },
-  error => {
-    console.log("Answer Error: ", error.response)
+  (error) => {
+    console.log("Answer Error: ", error.response);
 
     if (error.response.status == 401) {
       // console.log('Make a new request for the refresh route!')
@@ -50,7 +50,8 @@ axiosClient.interceptors.response.use(
 
       localStorage.removeItem("token");
     }
-    return Promise.reject(error)
-  })
+    return Promise.reject(error);
+  },
+);
 
 export default axiosClient;

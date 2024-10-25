@@ -26,44 +26,44 @@ export const setAuthenticate = (authenticate: boolean) => {
   return {
     type: SET_AUTHENTICATE,
     payload: authenticate,
-  }
-}
+  };
+};
 
 export const signIn =
   ({ email, password }: SignInDto, callback: () => void) =>
-    async (dispatch: Dispatch) => {
+  async (dispatch: Dispatch) => {
+    dispatch({
+      type: SIGN_IN_REQUEST,
+      payload: true,
+    });
+
+    try {
+      const res = await authService.signIn({ email, password });
+
       dispatch({
-        type: SIGN_IN_REQUEST,
+        type: SIGN_IN_SUCCESS,
         payload: true,
       });
 
-      try {
-        const res = await authService.signIn({ email, password });
+      dispatch({
+        type: SIGN_IN_FAILURE,
+        payload: "",
+      });
 
-        dispatch({
-          type: SIGN_IN_SUCCESS,
-          payload: true,
-        });
-
-        dispatch({
-          type: SIGN_IN_FAILURE,
-          payload: "",
-        });
-
-        localStorage.setItem("token", res?.accessToken);
-        callback();
-      } catch (error) {
-        dispatch({
-          type: SIGN_IN_FAILURE,
-          payload: "Sign In Failed",
-        });
-      } finally {
-        dispatch({
-          type: SIGN_IN_REQUEST,
-          payload: false,
-        });
-      }
-    };
+      localStorage.setItem("token", res?.accessToken);
+      callback();
+    } catch (error) {
+      dispatch({
+        type: SIGN_IN_FAILURE,
+        payload: "Sign In Failed",
+      });
+    } finally {
+      dispatch({
+        type: SIGN_IN_REQUEST,
+        payload: false,
+      });
+    }
+  };
 
 const authReducer: Reducer = (state = initialState, action) => {
   switch (action.type) {

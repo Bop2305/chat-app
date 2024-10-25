@@ -12,7 +12,11 @@ type LayoutProps = {
   children: React.ReactNode;
 };
 
-const Layout: React.FC<LayoutProps> = ({ authenticate, setAuthenticate, children }) => {
+const Layout: React.FC<LayoutProps> = ({
+  authenticate,
+  setAuthenticate,
+  children,
+}) => {
   const router = useRouter();
 
   useEffect(() => {
@@ -20,11 +24,11 @@ const Layout: React.FC<LayoutProps> = ({ authenticate, setAuthenticate, children
     if (token) {
       setAuthenticate(true);
     }
-  }, [setAuthenticate])
+  }, [setAuthenticate]);
 
   useEffect(() => {
-    if(!authenticate) router.push("/login")
-  }, [authenticate])
+    if (!authenticate) router.push("/login");
+  }, [authenticate]);
 
   return (
     <>
@@ -40,7 +44,8 @@ const mapStateToProps = (state: any) => ({
 });
 
 const mapDispatchToProps = (dispatch: any) => ({
-  setAuthenticate: (authenticate: boolean) => dispatch(setAuthenticate(authenticate)),
-})
+  setAuthenticate: (authenticate: boolean) =>
+    dispatch(setAuthenticate(authenticate)),
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(Layout);
