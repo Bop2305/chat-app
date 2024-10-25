@@ -1,86 +1,79 @@
 "use client";
 import Button from "@/components/Button";
 import FormInput from "@/components/FormInput";
-import authService from "@/store/auth.service";
+import userService from "@/services/user.service";
 import { yupResolver } from "@hookform/resolvers/yup";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 
-const SignUp: React.FC = () => {
-  const router = useRouter();
+const Profile: React.FC = () => {
+  const [user, setUser] = useState<Record<string, any>>();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const user = await userService.getUserById();
+      setUser(user);
+    };
+  
+    fetchUser();
+  }, []);
 
   const schema = yup
     .object({
       firstName: yup.string().required("First Name required"),
       lastName: yup.string().required("Last Name required"),
       email: yup.string().required("Email required"),
-      password: yup.string().required("Password required"),
     })
     .required();
 
-  const defaultValues = {
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-  };
-
   const formResult = useForm({
     resolver: yupResolver(schema),
-    defaultValues,
   });
+
+  useEffect(() => {
+    formResult.setValue("firstName", user?.firstName)
+    formResult.setValue("lastName", user?.lastName)
+    formResult.setValue("email", user?.email)
+  }, [user])
 
   const onSubmit = async (values: any) => {
     console.log(values);
-    const res = await authService.signUp(values);
-
-    if (res) router.push("/login");
+    await userService.updateUser(values);
   };
 
   return (
     <>
       <div className="flex flex-col mx-auto mt-[50px] w-[500px]">
         <h2 className="text-2xl text-gray-700 mb-4 text-center">
-          Create a new account
+          Profile
         </h2>
         <FormInput
           label="First Name"
           name="firstName"
           register={formResult.register}
-          errors={formResult.formState.errors.firstName}
+          errors={formResult.formState.errors.firstName as any}
         />
         <FormInput
           label="Last Name"
           name="lastName"
           register={formResult.register}
-          errors={formResult.formState.errors.lastName}
+          errors={formResult.formState.errors.lastName as any}
         />
         <FormInput
           label="Email"
           name="email"
           register={formResult.register}
-          errors={formResult.formState.errors.email}
-        />
-        <FormInput
-          label="Password"
-          name="password"
-          type="password"
-          register={formResult.register}
-          errors={formResult.formState.errors.password}
+          errors={formResult.formState.errors.email as any}
         />
         <Button
           type="button"
-          label="Sign In"
+          label="Update"
           onClick={formResult.handleSubmit(onSubmit)}
         />
-        <Link className="mt-4 text-md text-green-700" href={"/login"}>
-          Already have an account
-        </Link>
       </div>
     </>
   );
 };
 
-export default SignUp;
+export default Profile;

@@ -53,6 +53,7 @@ const SignIn: React.FC<SignInProps> = ({ signIn }) => {
         <FormInput
           label="Password"
           name="password"
+          type="password"
           register={formResult.register}
           errors={formResult.formState.errors.password}
         />

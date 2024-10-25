@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,14 +6,13 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { SignInDto } from './dto/signin.dto';
-import { SignInResponseDto } from './dto/signin-response.dto';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
-  ) {}
+  ) { }
 
   private async hashPassword(password: string, salt: string): Promise<string> {
     return bcrypt.hash(password, salt);
@@ -47,7 +46,9 @@ export class UserService {
 
     const user = await this.userRepository.findOneBy({ email });
 
-    if (user && user.validatePassword(password)) {
+    const verifyPassword = await user.validatePassword(password);
+
+    if (user && verifyPassword) {
       delete user.salt;
       delete user.password;
 
@@ -57,25 +58,45 @@ export class UserService {
     }
   }
 
-  async findById(id: number) {
-    const user = await this.userRepository.findOneBy({ id });
+  async findById(id: number): Promise<User> {
+    try {
+      const user = await this.userRepository.findOneBy({ id });
 
-    return user.id;
+      if (!user) {
+        return null;
+      }
+
+      delete user.password;
+      delete user.salt;
+
+      return user;
+    } catch (error) {
+      console.log(error)
+    }
   }
 
-  findAll() {
-    return `This action returns all user`;
-  }
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    try {
+      const userResult = await this.userRepository.findOneBy({ id });
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
+      if (!userResult) {
+        throw new BadRequestException("Invalid User")
+      }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
+      const { firstName, lastName, email } = updateUserDto;
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+      userResult.firstName = firstName;
+      userResult.lastName = lastName;
+      userResult.email = email;
+
+      await this.userRepository.save(userResult);
+
+      delete userResult.password;
+      delete userResult.salt
+
+      return userResult;
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
