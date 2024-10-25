@@ -1,27 +1,27 @@
 import axiosClient from "@/utils/axiosClient";
 
 export type SignInDto = {
-  userName: string;
+  email: string;
   password: string;
 };
 
 export type SignUpDto = {
-  userName: string;
   firstName: string;
   lastName: string;
   email: string;
+  password: string;
 };
 
 const signIn = async (data: SignInDto) => {
-  const res = await axiosClient.post("/login", data);
+  const res = await axiosClient.post("/auth/login", data);
 
-  return res;
+  return res.data;
 };
 
 const signUp = async (data: SignUpDto) => {
-  const res = await axiosClient.post("/register", data);
+  const res = await axiosClient.post("/auth/register", data);
 
-  return res;
+  return res.data;
 };
 
 const authService = {

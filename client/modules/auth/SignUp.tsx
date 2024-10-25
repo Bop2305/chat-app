@@ -1,12 +1,16 @@
 "use client";
 import Button from "@/components/Button";
 import FormInput from "@/components/FormInput";
+import authService from "@/store/auth.service";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 
 const SignUp: React.FC = () => {
+  const router = useRouter();
+
   const schema = yup
     .object({
       firstName: yup.string().required("First Name required"),
@@ -28,8 +32,11 @@ const SignUp: React.FC = () => {
     defaultValues,
   });
 
-  const onSubmit = (values: any) => {
+  const onSubmit = async (values: any) => {
     console.log(values);
+    const res = await authService.signUp(values);
+
+    if (res) router.push("/login");
   };
 
   return (

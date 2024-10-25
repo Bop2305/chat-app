@@ -10,23 +10,24 @@ const axiosClient = axios.create({
   },
 });
 
-// axiosClient.interceptors.request.use(
-//   config => {
-//     /* ---- 'Accept': 'application/json',
-//     'Authorization': this.token, ---- */
-//     config.headers['Accept'] = 'application/json';
+axiosClient.interceptors.request.use(
+  (config) => {
+    /* ---- 'Accept': 'application/json',
+    'Authorization': this.token, ---- */
+    config.headers["Accept"] = "application/json";
 
-//     let token = localStorage.getItem("token");
-//     token = 'Bearer ' + token;
+    let token = localStorage.getItem("token");
+    token = "Bearer " + token;
 
-//     config.headers.Authorization = token;
+    config.headers.Authorization = token;
 
-//     return config;
-//   },
-//   error => {
-//     console.log("Request error: ", error)
-//     return Promise.reject(error)
-//   })
+    return config;
+  },
+  (error) => {
+    console.log("Request error: ", error);
+    return Promise.reject(error);
+  },
+);
 
 // axiosClient.interceptors.response.use(
 //   response => {

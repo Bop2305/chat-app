@@ -1,12 +1,21 @@
 "use client";
 import Button from "@/components/Button";
 import FormInput from "@/components/FormInput";
+import { signIn } from "@/store/auth.duck";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { connect } from "react-redux";
 import * as yup from "yup";
 
-const SignIn: React.FC = () => {
+type SignInProps = {
+  signIn: (data: any, callback: () => void) => void;
+};
+
+const SignIn: React.FC<SignInProps> = ({ signIn }) => {
+  const router = useRouter();
+
   const schema = yup
     .object({
       email: yup.string().required("Email required"),
@@ -24,8 +33,11 @@ const SignIn: React.FC = () => {
     defaultValues,
   });
 
-  const onSubmit = (values: any) => {
+  const onSubmit = async (values: any) => {
     console.log(values);
+    signIn(values, () => {
+      router.push("/");
+    });
   };
 
   return (
@@ -57,4 +69,11 @@ const SignIn: React.FC = () => {
   );
 };
 
-export default SignIn;
+const mapDispatchToProps = (dispatch: any) => {
+  return {
+    signIn: (data: any, callback: () => void) =>
+      dispatch(signIn(data, callback)),
+  };
+};
+
+export default connect(null, mapDispatchToProps)(SignIn);

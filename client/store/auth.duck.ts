@@ -1,5 +1,5 @@
 import { Dispatch, Reducer } from "@reduxjs/toolkit";
-import authService, { SignInDto } from "./auth.service";
+import authService, { SignInDto, SignUpDto } from "./auth.service";
 
 type StateTypes = {
   authenticate: boolean;
@@ -8,18 +8,23 @@ type StateTypes = {
 };
 
 const GET_AUTHENTICATE = "auth/GET_AUTHENTICATE";
-const SIGN_IN_REQUEST = "auth/SET_AUTHENTICATE_REQUEST";
-const SIGN_IN_SUCCESS = "auth/SET_AUTHENTICATE_SUCCESS";
-const SIGN_IN_FAILURE = "auth/SET_AUTHENTICATE_FAILURE";
+const SIGN_IN_REQUEST = "auth/SIGN_IN_REQUEST";
+const SIGN_IN_SUCCESS = "auth/SIGN_IN_SUCCESS";
+const SIGN_IN_FAILURE = "auth/SIGN_IN_FAILURE";
+const SIGN_UP_REQUEST = "auth/SIGN_UP_REQUEST";
+const SIGN_UP_SUCCESS = "auth/SIGN_UP_SUCCESS";
+const SIGN_UP_FAILURE = "auth/SIGN_UP_FAILURE";
+
+const token = localStorage ? localStorage.getItem("token") : "";
 
 const initialState: StateTypes = {
-  authenticate: false,
+  authenticate: token ? true : false,
   loading: false,
   error: "",
 };
 
 export const signIn =
-  ({ userName, password }: SignInDto) =>
+  ({ email, password }: SignInDto, callback: () => void) =>
   async (dispatch: Dispatch) => {
     dispatch({
       type: SIGN_IN_REQUEST,
@@ -27,7 +32,7 @@ export const signIn =
     });
 
     try {
-      const res = await authService.signIn({ userName, password });
+      const res = await authService.signIn({ email, password });
 
       dispatch({
         type: SIGN_IN_SUCCESS,
@@ -39,7 +44,8 @@ export const signIn =
         payload: "",
       });
 
-      // localStorage.setItem("token", res?.token)
+      localStorage.setItem("token", res?.accessToken);
+      callback();
     } catch (error) {
       dispatch({
         type: SIGN_IN_FAILURE,
