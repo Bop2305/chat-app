@@ -49,7 +49,9 @@ const SignIn: React.FC = () => {
           label="Sign In"
           onClick={formResult.handleSubmit(onSubmit)}
         />
-        <Link className="mt-4 text-md text-green-700" href={"/register"}>Create new account</Link>
+        <Link className="mt-4 text-md text-green-700" href={"/register"}>
+          Create new account
+        </Link>
       </div>
     </>
   );

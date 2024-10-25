@@ -35,7 +35,9 @@ const SignUp: React.FC = () => {
   return (
     <>
       <div className="flex flex-col mx-auto mt-[50px] w-[500px]">
-        <h2 className="text-2xl text-gray-700 mb-4 text-center">Create a new account</h2>
+        <h2 className="text-2xl text-gray-700 mb-4 text-center">
+          Create a new account
+        </h2>
         <FormInput
           label="First Name"
           name="firstName"
@@ -65,7 +67,9 @@ const SignUp: React.FC = () => {
           label="Sign In"
           onClick={formResult.handleSubmit(onSubmit)}
         />
-        <Link className="mt-4 text-md text-green-700" href={"/login"}>Already have an account</Link>
+        <Link className="mt-4 text-md text-green-700" href={"/login"}>
+          Already have an account
+        </Link>
       </div>
     </>
   );
