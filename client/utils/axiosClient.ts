@@ -29,27 +29,28 @@ axiosClient.interceptors.request.use(
   },
 );
 
-// axiosClient.interceptors.response.use(
-//   response => {
-//     console.log('Intercepting the response before sending it', response)
-//     return response
-//   },
-//   error => {
-//     console.log("Answer Error: ", error.response)
+axiosClient.interceptors.response.use(
+  response => {
+    console.log('Intercepting the response before sending it', response)
+    return response
+  },
+  error => {
+    console.log("Answer Error: ", error.response)
 
-//     if (error.response.status == 401) {
-//       console.log('Make a new request for the refresh route!')
+    if (error.response.status == 401) {
+      // console.log('Make a new request for the refresh route!')
 
-//       axios.post('http://localhost:8000/api/refresh')
-//         .then(response => {
-//           console.log('Refresh success! ')
-//           console.log(response)
-//           localStorage.setItem("token", response.data)
-//           window.location.reload()
-//         })
-//     }
-//     localStorage.setItem("token", "");
-//     return Promise.reject(error)
-//   })
+      // axios.post('http://localhost:8000/api/refresh')
+      //   .then(response => {
+      //     console.log('Refresh success! ')
+      //     console.log(response)
+      //     localStorage.setItem("token", response.data)
+      //     window.location.reload()
+      //   })
+
+      localStorage.removeItem("token");
+    }
+    return Promise.reject(error)
+  })
 
 export default axiosClient;
