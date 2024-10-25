@@ -12,7 +12,7 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
-  ) { }
+  ) {}
 
   private async hashPassword(password: string, salt: string): Promise<string> {
     return bcrypt.hash(password, salt);
@@ -71,7 +71,7 @@ export class UserService {
 
       return user;
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }
 
@@ -80,7 +80,7 @@ export class UserService {
       const userResult = await this.userRepository.findOneBy({ id });
 
       if (!userResult) {
-        throw new BadRequestException("Invalid User")
+        throw new BadRequestException('Invalid User');
       }
 
       const { firstName, lastName, email } = updateUserDto;
@@ -92,7 +92,7 @@ export class UserService {
       await this.userRepository.save(userResult);
 
       delete userResult.password;
-      delete userResult.salt
+      delete userResult.salt;
 
       return userResult;
     } catch (error) {

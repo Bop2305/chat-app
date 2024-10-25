@@ -15,7 +15,7 @@ const Profile: React.FC = () => {
       const user = await userService.getUserById();
       setUser(user);
     };
-  
+
     fetchUser();
   }, []);
 
@@ -32,10 +32,10 @@ const Profile: React.FC = () => {
   });
 
   useEffect(() => {
-    formResult.setValue("firstName", user?.firstName)
-    formResult.setValue("lastName", user?.lastName)
-    formResult.setValue("email", user?.email)
-  }, [user])
+    formResult.setValue("firstName", user?.firstName);
+    formResult.setValue("lastName", user?.lastName);
+    formResult.setValue("email", user?.email);
+  }, [user]);
 
   const onSubmit = async (values: any) => {
     console.log(values);
@@ -45,9 +45,7 @@ const Profile: React.FC = () => {
   return (
     <>
       <div className="flex flex-col mx-auto mt-[50px] w-[500px]">
-        <h2 className="text-2xl text-gray-700 mb-4 text-center">
-          Profile
-        </h2>
+        <h2 className="text-2xl text-gray-700 mb-4 text-center">Profile</h2>
         <FormInput
           label="First Name"
           name="firstName"
