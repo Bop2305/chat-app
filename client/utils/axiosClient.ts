@@ -39,7 +39,6 @@ axiosClient.interceptors.response.use(
 
     if (error.response.status == 401) {
       // console.log('Make a new request for the refresh route!')
-
       // axios.post('http://localhost:8000/api/refresh')
       //   .then(response => {
       //     console.log('Refresh success! ')

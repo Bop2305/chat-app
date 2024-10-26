@@ -5,7 +5,7 @@ interface ButtonProps {
   onClick: (e: any) => void;
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
-  height?: 'sm' | 'md' | "lg" | 'xl'
+  height?: "sm" | "md" | "lg" | "xl";
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -13,23 +13,23 @@ const Button: React.FC<ButtonProps> = ({
   onClick,
   type = "button",
   disabled = false,
-  height
+  height,
 }) => {
   const setHeight = () => {
     switch (height) {
-      case 'sm':
-        return "24px"
+      case "sm":
+        return "24px";
 
-      case 'md':
-        return "48px"
+      case "md":
+        return "48px";
 
-      case 'xl':
-        return "60px"
+      case "xl":
+        return "60px";
 
       default:
         return "36px";
     }
-  }
+  };
 
   return (
     <button
