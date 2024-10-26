@@ -51,6 +51,7 @@ export const signIn =
       });
 
       localStorage.setItem("token", res?.accessToken);
+      localStorage.setItem("userId", res?.user?.id);
       callback();
     } catch (error) {
       dispatch({

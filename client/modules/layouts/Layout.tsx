@@ -26,9 +26,9 @@ const Layout: React.FC<LayoutProps> = ({
     }
   }, [setAuthenticate]);
 
-  useEffect(() => {
-    if (!authenticate) router.push("/login");
-  }, [authenticate]);
+  // useEffect(() => {
+  //   if (!authenticate) router.push("/login");
+  // }, [authenticate]);
 
   return (
     <>

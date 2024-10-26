@@ -47,9 +47,8 @@ axiosClient.interceptors.response.use(
       //     localStorage.setItem("token", response.data)
       //     window.location.reload()
       //   })
-
-      localStorage.removeItem("token");
     }
+    localStorage.removeItem("token");
     return Promise.reject(error);
   },
 );
