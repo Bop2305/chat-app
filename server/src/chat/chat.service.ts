@@ -10,6 +10,8 @@ import { Chat } from './entities/chat.entity';
 import { Participant } from './entities/participant.entity';
 import { User } from 'src/user/entities/user.entity';
 import { CreateChatDto } from './dto/create-chat.dto';
+import { Message } from './entities/message.entity';
+import { SendMessageDto } from './dto/send-message.dto';
 
 @Injectable()
 export class ChatService {
@@ -22,6 +24,9 @@ export class ChatService {
 
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+
+    @InjectRepository(Message)
+    private readonly messageRepository: Repository<Message>,
   ) {}
 
   async createChat(userEmail: string, createChatDto: CreateChatDto) {
@@ -90,6 +95,34 @@ export class ChatService {
       }
 
       return chat;
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async sendMessage(sendMessageDto: SendMessageDto) {
+    try {
+      const { userId, chatId, content } = sendMessageDto;
+
+      const user = await this.userRepository.findOne({ where: { id: userId } });
+
+      if (!user) {
+        return new BadRequestException('User not found').getResponse();
+      }
+
+      const chat = await this.chatRepository.findOne({ where: { id: chatId } });
+
+      if (!chat) {
+        return new BadRequestException('Conversation not found').getResponse();
+      }
+
+      const message = new Message();
+
+      message.chatId = chat.id;
+      message.senderId = user.id;
+      message.content = content;
+
+      return await this.messageRepository.save(message);
     } catch (error) {
       throw new InternalServerErrorException();
     }

@@ -20,7 +20,7 @@ import { ChatModule } from './chat/chat.module';
       database: 'chat-app-db',
       entities: [join(__dirname, '**', '*.entity.{ts,js}')],
       synchronize: true,
-      logging: true,
+      logging: false,
     }),
     EventsModule,
     UserModule,
