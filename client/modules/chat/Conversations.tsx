@@ -1,20 +1,54 @@
 import Button from "@/components/Button";
 import CreateChatModal from "./CreateChatModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import chatService from "@/services/chat.service";
 
-const data = ["Group 1", "Group 2", "Group 3"];
+type ConversationsProps = {
+  selectedChatId: number | undefined;
+  setSelectedChatId: (selectedChatId: number | undefined) => void;
+};
 
-const Conversations: React.FC = () => {
+const Conversations: React.FC<ConversationsProps> = ({
+  selectedChatId,
+  setSelectedChatId,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [chats, setChats] = useState([]);
+
+  useEffect(() => {
+    async function fetchChats() {
+      const data = await chatService.getChats();
+
+      if (data) {
+        setSelectedChatId(data[0]?.id);
+        setChats(data);
+      }
+    }
+
+    fetchChats();
+  }, []);
 
   return (
     <>
-      <div>
-        <Button label="Add" onClick={() => setIsOpen(true)} height="lg" />
-        <ul>
-          {data.map((value, index) => {
-            return <li key={index}>{value}</li>;
-          })}
+      <div className="p-4 bg-gray-100 rounded-lg shadow-md max-w-sm mx-auto">
+        <div className="flex justify-end">
+          <Button label="Add" onClick={() => setIsOpen(true)} />
+        </div>
+
+        <ul className="space-y-2 mt-4">
+          {chats.map((item: any) => (
+            <li
+              key={item?.id}
+              onClick={() => setSelectedChatId(item?.id)}
+              className={`p-3 rounded-lg cursor-pointer hover:bg-gray-200 transition ${
+                selectedChatId === item?.id ? "bg-blue-200" : "bg-white"
+              }`}
+            >
+              <p className="text-gray-700 font-medium">
+                {item?.name || `Chat ${item?.id}`}
+              </p>
+            </li>
+          ))}
         </ul>
       </div>
 

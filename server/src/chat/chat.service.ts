@@ -55,9 +55,20 @@ export class ChatService {
     }
   }
 
-  async getChats() {
+  async getChats(userId: number) {
     try {
+      const user = await this.userRepository.findOne({ where: { id: userId } });
+
+      if (!user) {
+        return new BadRequestException('User not found').getResponse();
+      }
+
+      const participants = await this.participantRepository.find({
+        where: { userId: user.id },
+      });
+
       const chats = await this.chatRepository.find({
+        where: { participants: participants },
         relations: ['participants'],
       });
 

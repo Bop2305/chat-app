@@ -17,8 +17,8 @@ export class ChatController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  getChats() {
-    return this.chatService.getChats();
+  getChats(@Request() req) {
+    return this.chatService.getChats(req.user?.id);
   }
 
   @UseGuards(JwtAuthGuard)
