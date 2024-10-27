@@ -1,8 +1,10 @@
 import Button from "@/components/Button";
 import FormInput from "@/components/FormInput";
 import Modal from "@/components/Modal";
+import chatService from "@/services/chat.service";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 
 type CreateChatModalProps = {
   isOpen: boolean;
@@ -21,8 +23,25 @@ const CreateChatModal: React.FC<CreateChatModalProps> = ({
     setParticipants((prevValue) => [...prevValue, values.participant]);
   };
 
+  const handleSubmit = async () => {
+    const res = await chatService.createChat({ participants });
+
+    if (res?.status !== 200) {
+      toast.error("Invalid Email");
+      setParticipants([]);
+      return;
+    }
+
+    onClose();
+  };
+
   return (
-    <Modal title="Create Chat" isOpen={isOpen} onClose={onClose}>
+    <Modal
+      title="Create Chat"
+      isOpen={isOpen}
+      onClose={onClose}
+      onSubmit={() => handleSubmit()}
+    >
       <div>
         <div className="flex gap-2">
           <FormInput
@@ -40,7 +59,7 @@ const CreateChatModal: React.FC<CreateChatModalProps> = ({
             return <li key={item}>{item}</li>;
           })}
         </ul>
-        <Button label="Create" onClick={() => console.log("On Click")} />
+        {/* <Button label="Create" onClick={() => console.log("On Click")} /> */}
       </div>
     </Modal>
   );

@@ -5,6 +5,8 @@ import Header from "./Header";
 import { setAuthenticate } from "@/store/auth.duck";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 type LayoutProps = {
   authenticate: boolean;
@@ -35,6 +37,7 @@ const Layout: React.FC<LayoutProps> = ({
       {authenticate && <Header />}
       {children}
       <Footer />
+      <ToastContainer position="top-right" autoClose={5000} />
     </>
   );
 };
