@@ -1,5 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
+import { Participant } from 'src/chat/entities/participant.entity';
+import { Message } from 'src/chat/entities/message.entity';
 
 @Entity()
 export class User {
@@ -20,6 +22,12 @@ export class User {
 
   @Column()
   salt: string;
+
+  @OneToMany(() => Participant, (participant) => participant.user)
+  participants: Participant[];
+
+  @OneToMany(() => Message, (message) => message.sender)
+  messages: Message[];
 
   async validatePassword(password: string): Promise<boolean> {
     const hash = await bcrypt.hash(password, this.salt);
