@@ -1,4 +1,5 @@
 import axiosClient from "@/utils/axiosClient";
+import { toast } from "react-toastify";
 
 type UpdateUserDto = {
   firstName: string;
@@ -10,7 +11,7 @@ const getUserById = async () => {
   try {
     const res = await axiosClient.get(`/user/me`);
 
-    return res.data;
+    return res.data.data;
   } catch (error) {
     console.log(error);
   }
@@ -20,7 +21,11 @@ const updateUser = async (user: UpdateUserDto) => {
   try {
     const res = await axiosClient.post(`/user/me`, user);
 
-    return res.data;
+    if (res.data?.statusCode !== 201) {
+      toast.error(res.data?.message);
+    }
+
+    return res.data.data;
   } catch (error) {
     console.log(error);
   }

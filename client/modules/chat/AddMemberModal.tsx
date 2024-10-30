@@ -6,12 +6,14 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
-type CreateChatModalProps = {
+type AddMemberProps = {
+  chatId: number | undefined;
   isOpen: boolean;
   onClose: () => void;
 };
 
-const CreateChatModal: React.FC<CreateChatModalProps> = ({
+const AddMemberModal: React.FC<AddMemberProps> = ({
+  chatId,
   isOpen,
   onClose,
 }) => {
@@ -24,20 +26,23 @@ const CreateChatModal: React.FC<CreateChatModalProps> = ({
   };
 
   const handleSubmit = async () => {
-    const res = await chatService.createChat({ participants });
+    if (!chatId) return;
+    const res = await chatService.addMember(chatId, participants);
 
     if (res?.error) {
-      toast.error("Invalid Email");
+      toast.error(res?.message);
       setParticipants([]);
       return;
     }
+
+    toast.success("Add member success!");
 
     onClose();
   };
 
   return (
     <Modal
-      title="Create Chat"
+      title="Add Members"
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={() => handleSubmit()}
@@ -65,4 +70,4 @@ const CreateChatModal: React.FC<CreateChatModalProps> = ({
   );
 };
 
-export default CreateChatModal;
+export default AddMemberModal;

@@ -12,6 +12,7 @@ import { User } from 'src/user/entities/user.entity';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { Message } from './entities/message.entity';
 import { SendMessageDto } from './dto/send-message.dto';
+import { UpdateChatDto } from './dto/update-chat.dto';
 
 @Injectable()
 export class ChatService {
@@ -40,7 +41,24 @@ export class ChatService {
       });
 
       if (userEntities.length !== allParticipantsEmail.length) {
-        return new NotFoundException('One or more users not found');
+        throw new NotFoundException('One or more users not found');
+      }
+
+      // Check for existing conversation with these participants
+      const participantIds = userEntities.map((user) => user.id);
+      const existingChat = await this.chatRepository
+        .createQueryBuilder('chat')
+        .innerJoin('chat.participants', 'participant')
+        .where('participant.userId IN (:...participantIds)', { participantIds })
+        .groupBy('chat.id')
+        .having('COUNT(DISTINCT participant.userId) = :count', {
+          count: participantIds.length,
+        })
+        .getOne();
+
+      // If a chat with the same participants exists, return it
+      if (existingChat) {
+        return existingChat;
       }
 
       const chat = this.chatRepository.create();
@@ -56,12 +74,75 @@ export class ChatService {
 
       return await this.participantRepository.save(newParticipants);
     } catch (error) {
-      throw new InternalServerErrorException('Failed to create chat');
+      // throw new InternalServerErrorException('Failed to create chat');
+      return error;
+    }
+  }
+
+  async addMember(userId: number, chatId: number, participants: string[]) {
+    try {
+      console.log('[userId]', userId);
+      console.log('[chatId]', chatId);
+      const existedChat = await this.chatRepository.findOne({
+        where: { id: chatId, participants: { userId: In([userId]) } },
+        relations: ['participants'],
+      });
+
+      console.log('[existedChat]', existedChat);
+
+      const chat = await this.chatRepository.findOne({
+        where: { id: existedChat.id },
+        relations: ['participants'],
+      });
+
+      console.log('[chat]', chat);
+
+      if (!chat) {
+        throw new BadRequestException('Chat not found');
+      }
+
+      const users = await this.userRepository.find({
+        where: { email: In(participants) },
+      });
+
+      if (users.length !== participants.length) {
+        throw new NotFoundException('One or more users not found');
+      }
+
+      // Check if any of the users are already participants
+      const existingParticipantIds = chat.participants.map(
+        (participant) => participant.userId,
+      );
+      console.log('[existingParticipantIds]', existingParticipantIds);
+
+      const existedUser = users.filter((user) =>
+        existingParticipantIds.includes(user.id),
+      );
+      console.log('[existedUser]', existedUser);
+
+      if (existedUser.length > 0) {
+        const existedUserMails = existedUser.map((user) => user.email);
+        throw new BadRequestException(`${existedUserMails} already existed`);
+      }
+
+      // Map new users to Participant entities
+      const newParticipants = users.map((user) => {
+        const pa = new Participant();
+        pa.userId = user.id;
+        pa.chatId = chatId;
+        return pa;
+      });
+
+      return this.participantRepository.save(newParticipants);
+    } catch (error) {
+      // throw new InternalServerErrorException();
+      throw error;
     }
   }
 
   async getChats(userId: number) {
     try {
+      console.log('[userId]', userId);
       const user = await this.userRepository.findOne({ where: { id: userId } });
 
       if (!user) {
@@ -72,8 +153,12 @@ export class ChatService {
         where: { userId: user.id },
       });
 
+      console.log('[participants]', participants);
+
       const chats = await this.chatRepository.find({
-        where: { participants: participants },
+        where: {
+          participants: { id: In(participants.map((item) => item.id)) },
+        },
         relations: ['participants'],
       });
 
@@ -104,13 +189,9 @@ export class ChatService {
     try {
       const { userId, chatId, content } = sendMessageDto;
 
-      const user = await this.userRepository.findOne({ where: { id: userId } });
-
-      if (!user) {
-        return new BadRequestException('User not found').getResponse();
-      }
-
-      const chat = await this.chatRepository.findOne({ where: { id: chatId } });
+      const chat = await this.chatRepository.findOne({
+        where: { id: chatId, participants: { userId } },
+      });
 
       if (!chat) {
         return new BadRequestException('Conversation not found').getResponse();
@@ -119,7 +200,7 @@ export class ChatService {
       const message = new Message();
 
       message.chatId = chat.id;
-      message.senderId = user.id;
+      message.senderId = userId;
       message.content = content;
 
       return await this.messageRepository.save(message);

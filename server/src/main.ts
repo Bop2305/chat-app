@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { IoAdapter } from '@nestjs/platform-socket.io';
+import { CustomResponseInterceptor } from './common/CustomResponseInterceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,6 +14,8 @@ async function bootstrap() {
 
   // Use WebSockets with CORS support
   app.useWebSocketAdapter(new IoAdapter(app));
+
+  app.useGlobalInterceptors(new CustomResponseInterceptor());
 
   await app.listen(process.env.PORT ?? 8000);
 }

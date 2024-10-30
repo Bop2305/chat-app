@@ -40,7 +40,7 @@ export class ChatGateway
     await this.chatService.sendMessage(payload);
 
     const chat = await this.chatService.getChatById(payload.chatId);
-    console.log('[Chat]', chat);
+
     this.server.to(payload.chatId.toString()).emit('receiveMessage', chat);
   }
 

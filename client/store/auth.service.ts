@@ -15,13 +15,13 @@ export type SignUpDto = {
 const signIn = async (data: SignInDto) => {
   const res = await axiosClient.post("/auth/login", data);
 
-  return res.data;
+  return res.data.data;
 };
 
 const signUp = async (data: SignUpDto) => {
   const res = await axiosClient.post("/auth/register", data);
 
-  return res.data;
+  return res.data.data;
 };
 
 const authService = {

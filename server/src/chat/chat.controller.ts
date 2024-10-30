@@ -33,4 +33,16 @@ export class ChatController {
     const { id } = params;
     return this.chatService.getChatById(+id);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('add-member/:chatId')
+  addMember(
+    @Request() req,
+    @Param() params: { chatId: string },
+    @Body() data: string[],
+  ) {
+    const { chatId } = params;
+    const userId = req.user?.id;
+    return this.chatService.addMember(+userId, +chatId, data);
+  }
 }
