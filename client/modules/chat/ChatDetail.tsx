@@ -8,9 +8,8 @@ import {
 } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import io from "socket.io-client";
 import AddMemberModal from "./AddMemberModal";
-import { toast } from "react-toastify";
+import useSocket from "@/hooks/useSocket";
 
 type ChatDetailProps = {
   selectedChatId: number | undefined;
@@ -35,6 +34,8 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ selectedChatId }) => {
   const [showRightMenu, setShowRightMenu] = useState<boolean>(false);
   const [modal, setModal] = useState<Modal>(defaultModalValue);
 
+  const formResult = useForm();
+
   useEffect(() => {
     async function fetchChats() {
       if (!selectedChatId) return;
@@ -50,11 +51,7 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ selectedChatId }) => {
   }, [selectedChatId]);
 
   useEffect(() => {
-    const newSocket = io("http://localhost:8000", {
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
-    });
+    const { socket: newSocket } = useSocket();
     setSocket(newSocket);
 
     newSocket.on("connect", () => {
@@ -77,9 +74,9 @@ const ChatDetail: React.FC<ChatDetailProps> = ({ selectedChatId }) => {
       userId: localStorage.getItem("userId"),
       content: values?.msg,
     });
-  };
 
-  const formResult = useForm();
+    formResult.reset({ msg: "" });
+  };
 
   return (
     <div className="flex gap-4 w-full">

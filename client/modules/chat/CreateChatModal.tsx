@@ -1,10 +1,9 @@
 import Button from "@/components/Button";
 import FormInput from "@/components/FormInput";
 import Modal from "@/components/Modal";
-import chatService from "@/services/chat.service";
+import useSocket from "@/hooks/useSocket";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "react-toastify";
 
 type CreateChatModalProps = {
   isOpen: boolean;
@@ -17,6 +16,8 @@ const CreateChatModal: React.FC<CreateChatModalProps> = ({
 }) => {
   const [participants, setParticipants] = useState<string[]>([]);
 
+  const { socket } = useSocket();
+
   const formResult = useForm();
 
   const handleAddParticipant = (values: any) => {
@@ -24,13 +25,7 @@ const CreateChatModal: React.FC<CreateChatModalProps> = ({
   };
 
   const handleSubmit = async () => {
-    const res = await chatService.createChat({ participants });
-
-    if (res?.error) {
-      toast.error("Invalid Email");
-      setParticipants([]);
-      return;
-    }
+    socket.emit("createConversation", { participants });
 
     onClose();
   };

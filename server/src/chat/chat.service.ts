@@ -30,7 +30,10 @@ export class ChatService {
     private readonly messageRepository: Repository<Message>,
   ) {}
 
-  async createChat(userEmail: string, createChatDto: CreateChatDto) {
+  async createChat(
+    userEmail: string,
+    createChatDto: CreateChatDto,
+  ): Promise<Chat> {
     try {
       const { participants } = createChatDto;
 
@@ -72,7 +75,12 @@ export class ChatService {
         return participant;
       });
 
-      return await this.participantRepository.save(newParticipants);
+      await this.participantRepository.save(newParticipants);
+
+      return await this.chatRepository.findOne({
+        where: { id: chat.id },
+        relations: ['participants'],
+      });
     } catch (error) {
       // throw new InternalServerErrorException('Failed to create chat');
       return error;
@@ -140,13 +148,13 @@ export class ChatService {
     }
   }
 
-  async getChats(userId: number) {
+  async getChats(userId: number): Promise<Chat[]> {
     try {
       console.log('[userId]', userId);
       const user = await this.userRepository.findOne({ where: { id: userId } });
 
       if (!user) {
-        return new BadRequestException('User not found').getResponse();
+        throw new BadRequestException('User not found');
       }
 
       const participants = await this.participantRepository.find({
@@ -164,11 +172,12 @@ export class ChatService {
 
       return chats;
     } catch (error) {
-      throw new InternalServerErrorException();
+      // throw new InternalServerErrorException();
+      return error;
     }
   }
 
-  async getChatById(id: number) {
+  async getChatById(id: number): Promise<Chat> {
     try {
       const chat = await this.chatRepository.findOne({
         where: { id: id },
@@ -176,12 +185,12 @@ export class ChatService {
       });
 
       if (!chat) {
-        return new BadRequestException().getResponse();
+        throw new BadRequestException();
       }
 
       return chat;
     } catch (error) {
-      throw new InternalServerErrorException();
+      throw error;
     }
   }
 
@@ -194,7 +203,7 @@ export class ChatService {
       });
 
       if (!chat) {
-        return new BadRequestException('Conversation not found').getResponse();
+        throw new BadRequestException('Conversation not found');
       }
 
       const message = new Message();
@@ -205,7 +214,8 @@ export class ChatService {
 
       return await this.messageRepository.save(message);
     } catch (error) {
-      throw new InternalServerErrorException();
+      // throw new InternalServerErrorException();
+      return error;
     }
   }
 }

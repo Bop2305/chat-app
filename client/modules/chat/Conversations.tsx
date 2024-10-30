@@ -1,7 +1,8 @@
 import Button from "@/components/Button";
 import CreateChatModal from "./CreateChatModal";
 import { useEffect, useState } from "react";
-import chatService from "@/services/chat.service";
+import useSocket from "@/hooks/useSocket";
+import { toast } from "react-toastify";
 
 type ConversationsProps = {
   selectedChatId: number | undefined;
@@ -16,16 +17,25 @@ const Conversations: React.FC<ConversationsProps> = ({
   const [chats, setChats] = useState([]);
 
   useEffect(() => {
-    async function fetchChats() {
-      const data = await chatService.getChats();
+    const { socket } = useSocket();
 
-      if (data) {
+    socket.on("connect", () => {
+      socket.emit("joinNamespace");
+
+      socket.on("fetchConversations", (data) => {
         setSelectedChatId(data[0]?.id);
         setChats(data);
-      }
-    }
+      });
 
-    fetchChats();
+      socket.on("notifications", (data) => {
+        console.log("Noti");
+        toast.info(data);
+      });
+    });
+
+    return () => {
+      socket.close();
+    };
   }, []);
 
   return (
